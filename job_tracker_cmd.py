@@ -38,7 +38,7 @@ def execute_query(query):
     try:
         conn = psycopg2.connect(host = 'localhost', dbname = 'jobs', user='postgres', password='zfechko')
         cursor = conn.cursor()
-        c.print('[bold green]Connected to the database[/bold green]')
+        #c.print('[bold green]Connected to the database[/bold green]')
     except:
         c.print('[bold red]Failed to connect to the database[/bold red]')
         exit()
@@ -79,12 +79,19 @@ def update_listing():
     """
     clear_screen()
     c = Console()
-    display_listings()
-    id = input('Enter the ID of the listing you want to update: ')
+    
+    results = execute_query("SELECT TITLE, COMPANY FROM POSITION ORDER BY ID ASC;")
+    options = [f'{row[0]} at {row[1]}' for row in results]
+    title = "Select a listing to update: "
+    selected, index = pick(options, title, indicator='->')
+    id = index + 2 # ID is off in DB
+
     options = ['Job Title', 'Company', 'Salary', 'City', 'State', 'Job Type', 'Application Date', 'Application Status']
-    title = "What would you like to update?"
+    title = f"What would you like to update from {selected}?"
     option, index = pick(options, title, indicator='->')
     new_value = input('Enter the new value: ')
+
+
     index_to_attribute_dict = {0: 'title', 1: 'company', 2: 'salary', 3: 'job_city', 4: 'job_state', 5: 'job_type', 6: 'applied_on', 7: 'status'}
     query = f"UPDATE POSITION SET {index_to_attribute_dict[index]} = '{new_value}' WHERE id = {id};"
     execute_query(query)
@@ -101,7 +108,7 @@ def display_listings():
     result = execute_query(query)
     table = Table(
         "ID",
-        "Job Title",
+        Column(header="Job Title", no_wrap=True, style="cyan"),
         "Company",
         Column(header="Salary", style="green"),
         "City",
@@ -124,7 +131,7 @@ if __name__ == '__main__':
     ended = False
     while not ended:
         clear_screen()
-        title = 'Select an option: '
+        title = 'Select an option by using the arrow keys and ENTER: '
         options = ['Add an application', 'Update an application', 'Display all applications', 'Exit']
         option, index = pick(options, title, indicator='->')
         if index == 0:
@@ -133,7 +140,7 @@ if __name__ == '__main__':
             update_listing()
         elif index == 2:
             display_listings()
-            input()
+            input('Press ENTER to continue...')
         elif index == 3:
             ended = True
             clear_screen()
