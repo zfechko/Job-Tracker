@@ -107,9 +107,9 @@ def display_listings():
     query = f"SELECT * FROM POSITION ORDER BY ID ASC;"
     result = execute_query(query)
     table = Table(
-        "ID",
+        #"ID",
         Column(header="Job Title", no_wrap=True, style="cyan"),
-        "Company",
+        Column(header="Company", no_wrap=True, style="magenta"),
         Column(header="Salary", style="green"),
         "City",
         "State",
@@ -119,7 +119,7 @@ def display_listings():
         title='Jobs I\'ve Applied To')
 
     for row in result:
-        table.add_row(str(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], str(row[7]), row[8])
+        table.add_row(row[1], row[2], row[3], row[4], row[5], row[6], str(row[7]), row[8])
 
     c = Console()
     c.print(table)
