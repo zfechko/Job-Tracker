@@ -63,7 +63,10 @@ def add_listing():
     salary = input('Lower value of salary range: ')
     city = input('City: ').title()
     state = input('State: ').upper()
-    job_type = input('Job Type (In Person, Remote, Hybrid): ').title()
+    options = ['In Person', 'Hybrid', 'Remote']
+    title = 'Job Type: '
+    job_type, index = pick(options, title, indicator='->')
+    job_type = options[index]
     applied_on = date.today()
     query = f"INSERT INTO POSITION (title, company, salary, job_city, job_state, job_type, applied_on) VALUES ('{title}', '{company}', {salary}, '{city}', '{state}', '{job_type}', '{applied_on}');"
     execute_query(query)
@@ -96,7 +99,7 @@ def update_listing():
     query = f"UPDATE POSITION SET {index_to_attribute_dict[index]} = '{new_value}' WHERE id = {id};"
     execute_query(query)
 
-def display_listings():
+def display_all_listings():
     """
     Displays all listings in the database
 
@@ -104,7 +107,29 @@ def display_listings():
     - Shows the user the number of listings in the database
     """
     clear_screen()
-    query = f"SELECT * FROM POSITION ORDER BY ID ASC;"
+    query = f"SELECT * FROM POSITION ORDER BY STATUS, ID ASC;"
+    result = execute_query(query)
+    table = Table(
+        #"ID",
+        Column(header="Job Title", no_wrap=True, style="cyan"),
+        Column(header="Company", no_wrap=True, style="magenta"),
+        Column(header="Salary", style="green"),
+        "City",
+        "State",
+        "Job Type",
+        "Applied On",
+        "Application Status",
+        title='Jobs I\'ve Applied To')
+
+    for row in result:
+        table.add_row(row[1], row[2], row[3], row[4], row[5], row[6], str(row[7]), row[8])
+
+    c = Console()
+    c.print(table)
+
+def display_active_applications():
+    clear_screen()
+    query = f"SELECT * FROM POSITION WHERE NOT STATUS IN ('Rejected', 'Ghosted') ORDER BY STATUS, ID ASC;"
     result = execute_query(query)
     table = Table(
         #"ID",
@@ -126,22 +151,24 @@ def display_listings():
 
 
 
-
 if __name__ == '__main__':
     ended = False
     while not ended:
         clear_screen()
         title = 'Select an option by using the arrow keys and ENTER: '
-        options = ['Add an application', 'Update an application', 'Display all applications', 'Exit']
+        options = ['Add an application', 'Update an application','Display active applications', 'Display all applications', 'Exit']
         option, index = pick(options, title, indicator='->')
         if index == 0:
             add_listing()
         elif index == 1:
             update_listing()
         elif index == 2:
-            display_listings()
+            display_active_applications()
             input('Press ENTER to continue...')
         elif index == 3:
+            display_all_listings()
+            input('Press ENTER to continue...')
+        elif index == 4:
             ended = True
             clear_screen()
             c = Console()
