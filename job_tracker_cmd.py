@@ -58,7 +58,7 @@ def add_listing():
     clear_screen()
     c = Console()
     c.print('[bold]Adding a listing[/bold]')
-    title = input('Job Title: ').title()
+    job_title = input('Job Title: ').title()
     company = input('Company Name: ')
     salary = input('Lower value of salary range: ')
     city = input('City: ').title()
@@ -68,7 +68,7 @@ def add_listing():
     job_type, index = pick(options, title, indicator='->')
     job_type = options[index]
     applied_on = date.today()
-    query = f"INSERT INTO POSITION (title, company, salary, job_city, job_state, job_type, applied_on) VALUES ('{title}', '{company}', {salary}, '{city}', '{state}', '{job_type}', '{applied_on}');"
+    query = f"INSERT INTO POSITION (title, company, salary, job_city, job_state, job_type, applied_on) VALUES ('{job_title}', '{company}', {salary}, '{city}', '{state}', '{job_type}', '{applied_on}');"
     execute_query(query)
     pass
 
@@ -122,7 +122,7 @@ def display_all_listings():
         title='Jobs I\'ve Applied To')
 
     for row in result:
-        table.add_row(row[1], row[2], row[3], row[4], row[5], row[6], str(row[7]), row[8])
+        table.add_row(row[1], row[2], row[3], row[4], row[5], row[6], row[7].strftime('%b %d'), row[8])
 
     c = Console()
     c.print(table)
@@ -144,7 +144,7 @@ def display_active_applications():
         title='Jobs I\'ve Applied To')
 
     for row in result:
-        table.add_row(row[1], row[2], row[3], row[4], row[5], row[6], str(row[7]), row[8])
+        table.add_row(row[1], row[2], row[3], row[4], row[5], row[6], row[7].strftime('%b %d'), row[8])
 
     c = Console()
     c.print(table)
